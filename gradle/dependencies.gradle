@@ -2,7 +2,7 @@ ext {
     gsyVideoVersion = "v10.0.0"
     danmakuFlameMasterSoVersion = "0.9.25"
     glideVersion = "4.12.0"
-    mediaVersion = "1.6.1"
+    mediaVersion = "1.8.0-rc02"
     permissionsDispatcherVersion = "4.9.1"
 
     androidDependencies = [
@@ -23,7 +23,7 @@ ext {
     ]
 
     viewDependencies = [
-        ijkplayer            : "com.github.CarGuo:GSYIjkJava:1.0.0",
+        ijkplayer            : "io.github.carguo:gsyijkjava:1.0.0",
         danmakuFlameMaster   : "com.github.CarGuo.DanmakuFlameMaster:DanmakuFlameMaster:${danmakuFlameMasterSoVersion}",
         floatWindow          : "com.github.yhaolpz:FloatWindow:1.0.6",
 
@@ -49,7 +49,7 @@ ext {
             "androidx.media3:media3-ui:${mediaVersion}",
         ],
         aliplay:  [
-            "com.aliyun.sdk.android:AliyunPlayer:5.5.6.0-full"
+            "com.aliyun.sdk.android:AliyunPlayer:7.2.0-full"
         ]
     ]
 

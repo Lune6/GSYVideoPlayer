@@ -12,15 +12,15 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
         mavenCentral()
+        google()
         maven { url "https://maven.aliyun.com/repository/public" }
         maven { url "https://jitpack.io" }
         maven {
             url 'https://maven.pkg.github.com/CarGuo/GSYVideoPlayer'
             credentials {
                 username = 'carsmallguo'
-                password = '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'
+                password = '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'
             }
         }
     }
