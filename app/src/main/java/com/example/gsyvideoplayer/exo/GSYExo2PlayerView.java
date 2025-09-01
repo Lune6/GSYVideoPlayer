@@ -4,9 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.media.AudioManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.Surface;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -166,7 +167,7 @@ public class GSYExo2PlayerView extends StandardGSYVideoPlayer {
         getGSYVideoManager().setListener(this);
         getGSYVideoManager().setPlayTag(mPlayTag);
         getGSYVideoManager().setPlayPosition(mPlayPosition);
-        mAudioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+        // Audio focus is now handled by the base class GSYAudioFocusManager
         try {
             ((Activity) getActivityContext()).getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } catch (Exception e) {
@@ -234,7 +235,7 @@ public class GSYExo2PlayerView extends StandardGSYVideoPlayer {
         }
         if (getGSYVideoManager() != null && mHadPlay) {
             /**增加这个可以实现拖动后重新播放*/
-            if(!isInPlayingState()) {
+            if (!isInPlayingState()) {
                 setStateAndUi(CURRENT_STATE_PLAYING);
                 addTextureView();
             }
@@ -259,9 +260,8 @@ public class GSYExo2PlayerView extends StandardGSYVideoPlayer {
             mTextureViewContainer.removeAllViews();
         }
 
-        if (!mIfCurrentIsFullscreen)
-            getGSYVideoManager().setLastListener(null);
-        mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
+        if (!mIfCurrentIsFullscreen) getGSYVideoManager().setLastListener(null);
+        // Audio focus is now handled by the base class GSYAudioFocusManager
         if (mContext instanceof Activity) {
             try {
                 ((Activity) mContext).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -296,7 +296,7 @@ public class GSYExo2PlayerView extends StandardGSYVideoPlayer {
         getGSYVideoManager().setCurrentVideoHeight(0);
         getGSYVideoManager().setCurrentVideoWidth(0);
 
-        mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
+        // Audio focus is now handled by the base class GSYAudioFocusManager
         if (mContext instanceof Activity) {
             try {
                 ((Activity) mContext).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -307,7 +307,6 @@ public class GSYExo2PlayerView extends StandardGSYVideoPlayer {
 
         releaseNetWorkState();
     }
-
 
 
     /**********以下重载GSYVideoPlayer的GSYVideoViewBridge相关实现***********/
@@ -355,5 +354,18 @@ public class GSYExo2PlayerView extends StandardGSYVideoPlayer {
 
     public void nextUI() {
         resetProgressAndTime();
+    }
+
+
+    @Override
+    protected void setDisplay(Surface surface) {
+        if (surface != null && mTextureView.getShowView() instanceof SurfaceView) {
+            SurfaceView surfaceView = ((SurfaceView) mTextureView.getShowView());
+            ((GSYExoVideoManager) getGSYVideoManager()).setDisplayNew(surfaceView);
+        } else if (surface != null) {
+            getGSYVideoManager().setDisplay(surface);
+        } else {
+            ((GSYExoVideoManager) getGSYVideoManager()).setDisplayNew(null);
+        }
     }
 }
