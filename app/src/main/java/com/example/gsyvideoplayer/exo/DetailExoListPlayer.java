@@ -2,11 +2,10 @@ package com.example.gsyvideoplayer.exo;
 
 import android.os.Bundle;
 
-import androidx.core.widget.NestedScrollView;
+import androidx.activity.OnBackPressedCallback;
 
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.example.gsyvideoplayer.R;
 import com.example.gsyvideoplayer.databinding.ActivityDeatilExoListPlayerBinding;
@@ -42,7 +41,7 @@ public class DetailExoListPlayer extends GSYBaseActivityDetail<GSYExo2PlayerView
         /// 保持当前设置
         type = GSYVideoType.getRenderType();
         ///暂停切换不出现步进，需要使用 SurfaceView
-        GSYVideoType.setRenderType(GSYVideoType.SUFRACE);
+        GSYVideoType.setRenderType(GSYVideoType.SURFACE);
 
 
         //GSYBaseActivityDetail 的 普通模式初始化
@@ -97,6 +96,18 @@ public class DetailExoListPlayer extends GSYBaseActivityDetail<GSYExo2PlayerView
             }
         });
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (orientationUtils != null) {
+                    orientationUtils.backToProtVideo();
+                }
+                if (GSYExoVideoManager.backFromWindowFull(DetailExoListPlayer.this)) {
+                    return;
+                }
+                finish();
+            }
+        });
     }
 
 
@@ -106,23 +117,6 @@ public class DetailExoListPlayer extends GSYBaseActivityDetail<GSYExo2PlayerView
         /// 恢复设置
         GSYVideoType.setRenderType(type);
     }
-
-    /**
-     * 重载为GSYExoVideoManager的方法处理
-     */
-    @Override
-    public void onBackPressed() {
-        // ------- ！！！如果不需要旋转屏幕，可以不调用！！！-------
-        // 不需要屏幕旋转，还需要设置 setNeedOrientationUtils(false)
-        if (orientationUtils != null) {
-            orientationUtils.backToProtVideo();
-        }
-        if (GSYExoVideoManager.backFromWindowFull(this)) {
-            return;
-        }
-        super.onBackPressed();
-    }
-
 
     @Override
     public GSYExo2PlayerView getGSYVideoPlayer() {
