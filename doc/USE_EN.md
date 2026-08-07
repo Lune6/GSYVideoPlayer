@@ -444,6 +444,7 @@ PlayerFactory.setPlayManager(AliPlayerManager.class); // aliplay core mode
 
 #### Code structure adjustment, `CacheFactory` is more convenient for customization, defaults to `ProxyCacheManager`.
 ```java
+//ExoSourceManager.setCacheMaxSize(1024L * 1024L * 1024L); // exo cache size, set before Exo cache is created, default is 512 MB
 //CacheFactory.setCacheManager(new ExoPlayerCacheManager()); // exo cache mode, supports m3u8, only for exo
 //CacheFactory.setCacheManager(new ProxyCacheManager()); // proxy cache mode, supports all modes, does not support m3u8, etc.
 ```
@@ -495,6 +496,66 @@ GSYVideoType.setRenderType(GSYVideoType.SUFRACE);
 // GLSurfaceView, supports filters
 GSYVideoType.setRenderType(GSYVideoType.GLSURFACE);
 ```
+
+### Recent Features
+
+For recently added playback features, see [RECENT_FEATURES_EN.md](RECENT_FEATURES_EN.md). It lists demo entries, main classes, and regression scope.
+
+Common entry points:
+
+- `Open VIDEO`: WebVTT seek preview via `PreViewGSYVideoPlayer#setPreviewVttUrl(String)`.
+- `Custom EXO subtitles`, `Common subtitles non-EXO`: unified external SRT/WebVTT subtitles across player cores.
+- `Keep last frame`: keep-last-frame demo controlled by `KeepLastFrameVideo#setKeepLastFrameWhenComplete(boolean)`, see [KEEP_LAST_FRAME_EN.md](KEEP_LAST_FRAME_EN.md).
+- `Filter`: GLSurfaceView filters and GL effect scenes.
+- `Seamless switch`: multi-URL quality switching for separate URLs.
+- `EXO adaptive quality`: HLS master / DASH MPD adaptive quality demo for standard multi-bitrate streams.
+- `Cast Demo`: `CastDemoActivity` opens the DLNA device picker. `SampleCastControlVideo` demonstrates how the local player collapses into a remote-control overlay while casting, and how it resumes at the last known remote position on disconnect. Enable `Loopback Receiver` for TV-less smoke tests.
+
+Exo adaptive quality APIs:
+
+```java
+GSYExoVideoManager.instance().getVideoTrackInfoList();
+GSYExoVideoManager.instance().clearVideoTrackOverride();
+GSYExoVideoManager.instance().setVideoTrackOverride(groupIndex, trackIndex);
+```
+
+Composed player screenshot APIs:
+
+```java
+player.taskShotPicWithView(listener);
+player.saveFrameWithView(file, listener);
+```
+
+DLNA/UPnP cast APIs:
+
+```java
+// 1. Get the built-in cast capability (defaults to jUPnP 3.0.3 DLNA)
+CastCapability cast = GSYVideoManager.instance().getCastCapability();
+
+// 2. Device discovery
+cast.getProvider().startDiscovery(new CastListener() {
+    @Override public void onDeviceFound(CastDevice device) { /* show in a list */ }
+    @Override public void onDeviceLost(CastDevice device)  { /* remove from the list */ }
+});
+
+// 3. Cast at the current local position when the user picks a device
+long localPositionMs = videoPlayer.getCurrentPositionWhenPlaying();
+CastMediaInfo media = new CastMediaInfo(
+        url, title, "video/mp4", /*durationMs*/ 0L, localPositionMs);
+CastSession session = cast.connect(selectedDevice);
+session.setMediaItem(media);   // SPI runs SetAVTransportURI → Play → Seek(localPositionMs)
+
+// 4. Remote control / disconnect
+session.pause();
+session.seekTo(60_000L);
+session.stop();
+session.disconnect();
+
+// 5. Release discovery
+cast.getProvider().stopDiscovery();
+```
+
+Reference the demo in [SampleCastControlVideo](../app/src/main/java/com/example/gsyvideoplayer/video/SampleCastControlVideo.java) and [CastDemoActivity](../app/src/main/java/com/example/gsyvideoplayer/CastDemoActivity.java). Protocol details and the overall architecture live in [CAST_FEATURE_PLAN.md](CAST_FEATURE_PLAN.md) and [CAST_ARCHITECTURE.md](CAST_ARCHITECTURE.md).
 
 ### Advanced Customization
 

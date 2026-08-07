@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.WindowManager;
+import android.view.Gravity;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -28,10 +30,15 @@ import com.shuyu.gsyvideoplayer.R;
 import com.shuyu.gsyvideoplayer.listener.GSYStateUiListener;
 import com.shuyu.gsyvideoplayer.listener.GSYVideoProgressListener;
 import com.shuyu.gsyvideoplayer.listener.LockClickListener;
+import com.shuyu.gsyvideoplayer.subtitle.GSYSubtitleController;
+import com.shuyu.gsyvideoplayer.subtitle.GSYSubtitleSource;
+import com.shuyu.gsyvideoplayer.subtitle.GSYSubtitleStyle;
+import com.shuyu.gsyvideoplayer.subtitle.GSYSubtitleView;
 import com.shuyu.gsyvideoplayer.utils.CommonUtil;
 import com.shuyu.gsyvideoplayer.utils.Debuger;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -181,6 +188,10 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
 
     protected GSYVideoProgressListener mGSYVideoProgressListener;
 
+    protected GSYSubtitleView mSubtitleView;
+
+    protected GSYSubtitleController mSubtitleController;
+
     public GSYVideoControlView(@NonNull Context context) {
         super(context);
     }
@@ -218,6 +229,8 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
 
         if (isInEditMode())
             return;
+
+        initSubtitleView(context);
 
         if (mStartButton != null) {
             mStartButton.setOnClickListener(this);
@@ -286,14 +299,48 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
         Debuger.printfLog(GSYVideoControlView.this.hashCode() + "------------------------------ dismiss onDetachedFromWindow");
         cancelProgressTimer();
         cancelDismissControlViewTimer();
+        releaseSubtitleLoader();
 
         // 释放音频焦点管理器资源
         releaseAudioFocusManager();
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        resumeReleasedSubtitleLoader();
+    }
+
+    @Override
+    public void release() {
+        super.release();
+        releaseSubtitleController();
+    }
+
+    protected void releaseSubtitleController() {
+        if (mSubtitleController != null) {
+            mSubtitleController.release();
+            mSubtitleController = null;
+        }
+    }
+
+    protected void releaseSubtitleLoader() {
+        if (mSubtitleController != null) {
+            mSubtitleController.clear();
+            mSubtitleController.releaseLoader();
+        }
+    }
+
+    protected void resumeReleasedSubtitleLoader() {
+        if (mSubtitleController != null) {
+            mSubtitleController.resumeReleasedLoader();
+        }
+    }
+
+    @Override
     public void onAutoCompletion() {
         super.onAutoCompletion();
+        clearSubtitleOnStop();
         if (mLockCurScreen) {
             lockTouchLogic();
             mLockScreen.setVisibility(GONE);
@@ -303,6 +350,7 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
     @Override
     public void onError(int what, int extra) {
         super.onError(what, extra);
+        clearSubtitleOnStop();
         if (mLockCurScreen) {
             lockTouchLogic();
             mLockScreen.setVisibility(GONE);
@@ -327,6 +375,7 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
                 if (isCurrentMediaListener()) {
                     Debuger.printfLog(GSYVideoControlView.this.hashCode() + "------------------------------ dismiss CURRENT_STATE_NORMAL");
                     cancelProgressTimer();
+                    clearSubtitleOnStop();
                     getGSYVideoManager().releaseMediaPlayer();
                     releasePauseCover();
                     mBufferPoint = 0;
@@ -351,6 +400,7 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
                 startProgressTimer();
                 break;
             case CURRENT_STATE_ERROR:
+                clearSubtitleOnStop();
                 if (isCurrentMediaListener()) {
                     getGSYVideoManager().releaseMediaPlayer();
                 }
@@ -358,6 +408,7 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
             case CURRENT_STATE_AUTO_COMPLETE:
                 Debuger.printfLog(GSYVideoControlView.this.hashCode() + "------------------------------ dismiss CURRENT_STATE_AUTO_COMPLETE");
                 cancelProgressTimer();
+                clearSubtitleOnStop();
                 if (mProgressBar != null) {
                     mProgressBar.setProgress(100);
                 }
@@ -372,6 +423,20 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
         resolveUIState(state);
         if (mGsyStateUiListener != null) {
             mGsyStateUiListener.onStateChanged(state);
+        }
+    }
+
+    protected void clearSubtitleOnStop() {
+        if (mSubtitleController != null) {
+            mSubtitleController.clearEmbeddedText();
+            mSubtitleController.clear();
+        }
+    }
+
+    protected void refreshSubtitleAfterSeek(long positionMs) {
+        if (mSubtitleController != null) {
+            mSubtitleController.clearEmbeddedText();
+            mSubtitleController.update(positionMs);
         }
     }
 
@@ -620,6 +685,7 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
                 long time = seekBar.getProgress() * getDuration() / 100;
                 mCurrentPosition = time;
                 getGSYVideoManager().seekTo(time);
+                refreshSubtitleAfterSeek(time);
             } catch (Exception e) {
                 Debuger.printfWarning(e.toString());
             }
@@ -789,6 +855,7 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
 //                    mSeekTimePosition = 1;
 //                }
                 getGSYVideoManager().seekTo(mSeekTimePosition);
+                refreshSubtitleAfterSeek(mSeekTimePosition);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -968,6 +1035,10 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
             mGSYVideoProgressListener.onProgress(progress, secProgress, currentTime, totalTime);
         }
 
+        if (mSubtitleController != null) {
+            mSubtitleController.update(currentTime);
+        }
+
         if (mProgressBar == null || mTotalTimeTextView == null || mCurrentTimeTextView == null) {
             return;
         }
@@ -1010,6 +1081,9 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
         if (mProgressBar == null || mTotalTimeTextView == null || mCurrentTimeTextView == null) {
             return;
         }
+        if (mSubtitleController != null) {
+            mSubtitleController.clear();
+        }
         mProgressBar.setProgress(0);
         mProgressBar.setSecondaryProgress(0);
         mCurrentTimeTextView.setText(CommonUtil.stringForTime(0));
@@ -1025,6 +1099,9 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
     protected void loopSetProgressAndTime() {
         if (mProgressBar == null || mTotalTimeTextView == null || mCurrentTimeTextView == null) {
             return;
+        }
+        if (mSubtitleController != null) {
+            mSubtitleController.clear();
         }
         mProgressBar.setProgress(0);
         mProgressBar.setSecondaryProgress(0);
@@ -1061,6 +1138,99 @@ public abstract class GSYVideoControlView extends GSYVideoView implements View.O
     protected void setViewShowState(View view, int visibility) {
         if (view != null) {
             view.setVisibility(visibility);
+        }
+    }
+
+    protected void initSubtitleView(Context context) {
+        if (mSubtitleView != null && mSubtitleController != null) {
+            return;
+        }
+        if (mSubtitleView == null) {
+            mSubtitleView = new GSYSubtitleView(context);
+            int horizontalMargin = CommonUtil.dip2px(context, 16);
+            int bottomMargin = CommonUtil.dip2px(context, GSYSubtitleStyle.defaultStyle().getBottomMarginDp());
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.gravity = Gravity.BOTTOM;
+            layoutParams.setMargins(horizontalMargin, 0, horizontalMargin, bottomMargin);
+            addView(mSubtitleView, layoutParams);
+        }
+        mSubtitleController = new GSYSubtitleController(context, mSubtitleView);
+    }
+
+    public void setSubtitleSources(List<GSYSubtitleSource> sources) {
+        ensureSubtitleController();
+        mSubtitleController.setSources(sources);
+    }
+
+    public void setSubtitleSource(GSYSubtitleSource source) {
+        ensureSubtitleController();
+        mSubtitleController.setSource(source);
+    }
+
+    public boolean selectSubtitle(String id) {
+        ensureSubtitleController();
+        return mSubtitleController.selectSubtitle(id);
+    }
+
+    public void setSubtitleEnabled(boolean enabled) {
+        ensureSubtitleController();
+        mSubtitleController.setEnabled(enabled);
+    }
+
+    public boolean isSubtitleEnabled() {
+        ensureSubtitleController();
+        return mSubtitleController.isEnabled();
+    }
+
+    public void setSubtitleOffsetMs(long offsetMs) {
+        ensureSubtitleController();
+        mSubtitleController.setOffsetMs(offsetMs);
+    }
+
+    public long getSubtitleOffsetMs() {
+        ensureSubtitleController();
+        return mSubtitleController.getOffsetMs();
+    }
+
+    public void setSubtitleStyle(GSYSubtitleStyle style) {
+        ensureSubtitleController();
+        mSubtitleController.setStyle(style);
+    }
+
+    public List<GSYSubtitleSource> getSubtitleSources() {
+        ensureSubtitleController();
+        return mSubtitleController.getSources();
+    }
+
+    public boolean hasExternalSubtitle() {
+        return mSubtitleController != null && mSubtitleController.hasExternalSubtitle();
+    }
+
+    public void setSubtitleTextFromPlayer(String text) {
+        ensureSubtitleController();
+        mSubtitleController.setEmbeddedText(text);
+    }
+
+    public void clearSubtitleTextFromPlayer() {
+        if (mSubtitleController != null) {
+            mSubtitleController.clearEmbeddedText();
+        }
+    }
+
+    protected GSYSubtitleController.GSYSubtitleSnapshot getSubtitleSnapshot() {
+        ensureSubtitleController();
+        return mSubtitleController.snapshot();
+    }
+
+    protected void restoreSubtitleSnapshot(GSYSubtitleController.GSYSubtitleSnapshot snapshot) {
+        ensureSubtitleController();
+        mSubtitleController.restore(snapshot);
+    }
+
+    protected void ensureSubtitleController() {
+        if (mSubtitleController == null) {
+            initSubtitleView(getContext());
         }
     }
 

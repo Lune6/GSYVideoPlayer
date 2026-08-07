@@ -8,6 +8,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.6.1'
         classpath 'io.github.gradle-nexus:publish-plugin:2.0.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:${kotlinVersion}"
     }
 }
 
@@ -34,8 +36,8 @@ allprojects {
         maven {
             url 'https://maven.pkg.github.com/CarGuo/GSYVideoPlayer'
             credentials {
-                username = 'carsmallguo'
-                password = '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'
+                username = project.findProperty('githubReadUser') ?: System.getenv('GITHUB_READ_USER') ?: 'carsmallguo'
+                password = project.findProperty('githubReadToken') ?: System.getenv('GITHUB_READ_TOKEN') ?: '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'
             }
         }
     }

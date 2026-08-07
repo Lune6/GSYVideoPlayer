@@ -25,6 +25,7 @@ import com.example.gsyvideoplayer.DetailPlayer;
 import com.example.gsyvideoplayer.DetailTransparentActivity;
 import com.example.gsyvideoplayer.FragmentVideoActivity;
 import com.example.gsyvideoplayer.InputUrlDetailActivity;
+import com.example.gsyvideoplayer.KeepLastFrameDemoActivity;
 import com.example.gsyvideoplayer.ListADVideoActivity2;
 import com.example.gsyvideoplayer.ListMultiVideoActivity;
 import com.example.gsyvideoplayer.ListVideo2Activity;
@@ -37,11 +38,14 @@ import com.example.gsyvideoplayer.RecyclerView2Activity;
 import com.example.gsyvideoplayer.RecyclerView3Activity;
 import com.example.gsyvideoplayer.RecyclerViewActivity;
 import com.example.gsyvideoplayer.ScrollingActivity;
+import com.example.gsyvideoplayer.SmartMediaCodecFallbackActivity;
+import com.example.gsyvideoplayer.SubtitleDetailPlayer;
 import com.example.gsyvideoplayer.ViewPager2Activity;
 import com.example.gsyvideoplayer.ViewPagerDemoActivity;
 import com.example.gsyvideoplayer.WebDetailActivity;
 import com.example.gsyvideoplayer.WindowActivity;
 import com.example.gsyvideoplayer.exo.DetailExoListPlayer;
+import com.example.gsyvideoplayer.exo.ExoAdaptiveTrackActivity;
 import com.example.gsyvideoplayer.exosubtitle.GSYExoSubTitleDetailPlayer;
 import com.example.gsyvideoplayer.switchplay.SwitchListVideoActivity;
 
@@ -196,6 +200,17 @@ public class JumpUtils {
         ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
     }
 
+    /**
+     * 跳转到智能硬解降级测试
+     *
+     * @param activity
+     */
+    public static void goSmartMediaCodecFallback(Activity activity) {
+        Intent intent = new Intent(activity, SmartMediaCodecFallbackActivity.class);
+        ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
+    }
+
 
     /**
      * 跳转到详情播放
@@ -311,6 +326,11 @@ public class JumpUtils {
         activity.startActivity(intent);
     }
 
+    public static void goToSubtitleDetailPlayer(Activity activity) {
+        Intent intent = new Intent(activity, SubtitleDetailPlayer.class);
+        activity.startActivity(intent);
+    }
+
     /**
      * 跳转到详情播放
      *
@@ -342,6 +362,11 @@ public class JumpUtils {
      */
     public static void goToDetailExoListPlayer(Activity activity) {
         Intent intent = new Intent(activity, DetailExoListPlayer.class);
+        activity.startActivity(intent);
+    }
+
+    public static void goToExoAdaptiveTrackActivity(Activity activity) {
+        Intent intent = new Intent(activity, ExoAdaptiveTrackActivity.class);
         activity.startActivity(intent);
     }
 
@@ -414,6 +439,11 @@ public class JumpUtils {
      */
     public static void gotoControl(Activity activity) {
         Intent intent = new Intent(activity, DetailControlActivity.class);
+        activity.startActivity(intent);
+    }
+
+    public static void gotoKeepLastFrameDemo(Activity activity) {
+        Intent intent = new Intent(activity, KeepLastFrameDemoActivity.class);
         activity.startActivity(intent);
     }
 

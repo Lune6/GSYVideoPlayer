@@ -2,6 +2,35 @@
 
 **[Click to see the Chinese version](UPDATE_VERSION.md)**
 
+### Unreleased
+
+### v13.1.0 (2026-06-30)
+
+- Publish the `gsyvideoplayer-compose` artifact to the Maven Central / GitHub Packages dual-channel release flow.
+- Add the `gsyVideoPlayer-compose` module with Wrapper (AndroidView bridge) and Native (Compose-drawn controls) integration modes.
+- Add 24 runnable Compose demo activities covering basic playback, lists, auto-play, multi-window, source switching, cache/download, subtitles, ads, custom danmaku, filters, WebView mixed layouts, audio-only, local files, and MediaCodec switching.
+- Add the smart MediaCodec fallback demo and research notes for identifying hardware-decoder-related failures before downgrading to software decode.
+- Improve the auto-play list demo lifecycle handling to reduce playback state drift during list reuse.
+- Improve Exo cache lifecycle and max-size configuration, with regression coverage for export/configuration behavior.
+- Add Java / Compose regression playbooks and align dual-channel publishing docs and dependency examples to v13.1.0.
+
+### v13.0.0 (2026-05-07)
+
+- Add an Exo HLS master / DASH MPD adaptive quality demo with video track listing, TrackSelector auto mode, and fixed video track override.
+- Add a recent playback features guide covering WebVTT seek preview, unified subtitles, keep-last-frame demo, screenshots, GL effects, multi-URL quality switching, and Exo adaptive quality.
+- Unified external subtitles support SRT/WebVTT across IJK, System, and Media3; subtitle failures do not interrupt video playback.
+- Seek preview now uses WebVTT thumbnail tracks and supports standalone images and sprite crop coordinates.
+- Screenshot handling now reports SurfaceView, TextureView, and GLSurfaceView failure paths and adds composed player screenshot APIs including UI.
+- GL demos include more effect scenes and safer renderer lifecycle, screenshot, and release behavior.
+- Multi-URL quality switching improves position sync, timeout handling, failure fallback, and temporary manager release to reduce jump-back-to-0 risk.
+- Add a keep-last-frame demo and guide for validating cover and Surface retention behavior after natural completion.
+- Player core creation and initialization failures now route through error callbacks and cleanup to reduce direct crash risk.
+- Improve Exo cache lifecycle handling and cleanup after GIF creation finishes or fails.
+- Fix subtitle loader release and resume behavior during detach, fullscreen, and small-window transitions to avoid leaked threads, lost subtitle state, and interrupted loads that do not recover.
+- Fall back to non-cache playback when the Exo cache folder is locked, and avoid stale hadCached state.
+- Fix bitmap cleanup when SurfaceView screenshot capture fails.
+- Fix stale preview VTT async loads overwriting a cleared or replaced provider.
+
 ### v12.1.0 (2026-04-01)
 
 - update media3 1.10.0

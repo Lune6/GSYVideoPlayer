@@ -273,6 +273,7 @@ public abstract class GSYBaseVideoPlayer extends GSYVideoControlView {
         to.setLooping(from.isLooping());
         to.setIsTouchWigetFull(from.mIsTouchWigetFull);
         to.setSpeed(from.getSpeed(), from.mSoundTouch, false);
+        to.restoreSubtitleSnapshot(from.getSubtitleSnapshot());
         to.setStateAndUi(from.mCurrentState);
     }
 
@@ -377,13 +378,13 @@ public abstract class GSYBaseVideoPlayer extends GSYVideoControlView {
      */
     protected void resolveNormalVideoShow(View oldF, ViewGroup vp, GSYVideoPlayer gsyVideoPlayer) {
 
-        if (oldF != null && oldF.getParent() != null) {
-            ViewGroup viewGroup = (ViewGroup) oldF.getParent();
-            vp.removeView(viewGroup);
-        }
         mCurrentState = getGSYVideoManager().getLastState();
         if (gsyVideoPlayer != null) {
             cloneParams(gsyVideoPlayer, this);
+        }
+        if (oldF != null && oldF.getParent() != null) {
+            ViewGroup viewGroup = (ViewGroup) oldF.getParent();
+            vp.removeView(viewGroup);
         }
         if (mCurrentState != CURRENT_STATE_NORMAL
             || mCurrentState != CURRENT_STATE_AUTO_COMPLETE) {
@@ -834,11 +835,11 @@ public abstract class GSYBaseVideoPlayer extends GSYVideoControlView {
     public void hideSmallVideo() {
         final ViewGroup vp = getViewGroup();
         GSYVideoPlayer gsyVideoPlayer = (GSYVideoPlayer) vp.findViewById(getSmallId());
-        removeVideo(vp, getSmallId());
         mCurrentState = getGSYVideoManager().getLastState();
         if (gsyVideoPlayer != null) {
             cloneParams(gsyVideoPlayer, this);
         }
+        removeVideo(vp, getSmallId());
         getGSYVideoManager().setListener(getGSYVideoManager().lastListener());
         getGSYVideoManager().setLastListener(null);
         setStateAndUi(mCurrentState);

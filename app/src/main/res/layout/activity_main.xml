@@ -37,6 +37,13 @@
             android:text="带控制DEMO" />
 
         <Button
+            android:id="@+id/keep_last_frame_demo"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="完成保留最后一帧" />
+
+        <Button
             android:id="@+id/transparent"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
@@ -232,6 +239,13 @@
             android:text="硬解码支持" />
 
         <Button
+            android:id="@+id/smart_media_codec"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="智能硬解降级" />
+
+        <Button
             android:id="@+id/detail_download_activity"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
@@ -261,11 +275,25 @@
             android:text="自定义Exo" />
 
         <Button
+            android:id="@+id/open_exo_adaptive"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Exo自适应清晰度" />
+
+        <Button
             android:id="@+id/detail_subtitle_activity"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="自定义Exo支持字幕" />
+
+        <Button
+            android:id="@+id/detail_subtitle_common_activity"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="通用字幕非Exo" />
 
         <Button
             android:id="@+id/detail_audio_activity"
@@ -294,6 +322,20 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="clear Cache" />
+
+        <Button
+            android:id="@+id/compose_demo"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Compose Demo 大全" />
+
+        <Button
+            android:id="@+id/cast_demo"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="投屏 Demo (M2c)" />
 
     </LinearLayout>
 </ScrollView>

@@ -359,10 +359,8 @@ public class IjkExo2MediaPlayer extends AbstractMediaPlayer implements Player.Li
 
     @Override
     public void release() {
-        if (mInternalPlayer != null) {
-            reset();
-            mEventLogger = null;
-        }
+        reset();
+        mEventLogger = null;
     }
 
     protected void prepareAsyncInternal() {
@@ -395,6 +393,8 @@ public class IjkExo2MediaPlayer extends AbstractMediaPlayer implements Player.Li
                 }
                 if (mSurface != null) mInternalPlayer.setVideoSurface(mSurface);
                 if (mMediaSource == null) {
+                    notifyOnError(IMediaPlayer.MEDIA_ERROR_UNKNOWN, IMediaPlayer.MEDIA_ERROR_UNKNOWN);
+                    release();
                     return;
                 }
                 mInternalPlayer.setMediaSource(mMediaSource);

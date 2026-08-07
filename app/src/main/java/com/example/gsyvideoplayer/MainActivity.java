@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.gsyvideoplayer.databinding.ActivityListVideoBinding;
 import com.example.gsyvideoplayer.databinding.ActivityMainBinding;
+import com.example.gsyvideoplayer.compose.ComposeDemoListActivity;
 import com.example.gsyvideoplayer.simple.SimpleActivity;
 import com.example.gsyvideoplayer.utils.JumpUtils;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.inputType.setOnClickListener(this);
         binding.openBtnEmpty.setOnClickListener(this);
         binding.openControl.setOnClickListener(this);
+        binding.keepLastFrameDemo.setOnClickListener(this);
         binding.openFilter.setOnClickListener(this);
         binding.openBtnPick.setOnClickListener(this);
         binding.openBtnAuto.setOnClickListener(this);
@@ -76,13 +78,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.openBtnAd2.setOnClickListener(this);
         binding.openListAd.setOnClickListener(this);
         binding.openCustomExo.setOnClickListener(this);
+        binding.openExoAdaptive.setOnClickListener(this);
         binding.openSimple.setOnClickListener(this);
         binding.openSwitch.setOnClickListener(this);
         binding.mediaCodec.setOnClickListener(this);
+        binding.smartMediaCodec.setOnClickListener(this);
         binding.detailNormalActivity.setOnClickListener(this);
         binding.detailDownloadActivity.setOnClickListener(this);
         binding.detailAudioActivity.setOnClickListener(this);
         binding.detailSubtitleActivity.setOnClickListener(this);
+        binding.detailSubtitleCommonActivity.setOnClickListener(this);
         binding.changeCore.setOnClickListener(this);
         binding.viewPager2Activity.setOnClickListener(this);
         binding.viewPagerDemoActivity.setOnClickListener(this);
@@ -90,6 +95,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.detailDownloadExoActivity.setOnClickListener(this);
         binding.tvPlay.setOnClickListener(this);
         binding.transparent.setOnClickListener(this);
+
+        binding.composeDemo.setOnClickListener(this);
+
+        binding.castDemo.setOnClickListener(this);
 
         boolean hadPermission = PermissionUtils.hasSelfPermissions(this, permissions);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hadPermission) {
@@ -173,6 +182,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.open_control:
                 JumpUtils.gotoControl(this);
                 break;
+            case R.id.keep_last_frame_demo:
+                JumpUtils.gotoKeepLastFrameDemo(this);
+                break;
             case R.id.open_filter:
                 JumpUtils.gotoFilter(this);
                 break;
@@ -212,11 +224,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //多个同时播放
                 JumpUtils.goToDetailExoListPlayer(this);
                 break;
+            case R.id.open_exo_adaptive:
+                JumpUtils.goToExoAdaptiveTrackActivity(this);
+                break;
             case R.id.open_switch:
                 JumpUtils.goToSwitch(this);
                 break;
             case R.id.media_codec:
                 JumpUtils.goMediaCodec(this);
+                break;
+            case R.id.smart_media_codec:
+                JumpUtils.goSmartMediaCodecFallback(this);
                 break;
             case R.id.detail_normal_activity:
                 JumpUtils.goToDetailNormalActivity(this);
@@ -229,6 +247,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.detail_subtitle_activity:
                 JumpUtils.goToGSYExoSubTitleDetailPlayer(this);
+                break;
+            case R.id.detail_subtitle_common_activity:
+                JumpUtils.goToSubtitleDetailPlayer(this);
                 break;
             case R.id.detail_audio_activity:
                 JumpUtils.goToDetailAudioActivity(this);
@@ -270,6 +291,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tv_play:
                 JumpUtils.goToTVVideoPlayer(this,binding.tvPlay);
+                break;
+            case R.id.compose_demo:
+                startActivity(new Intent(this, ComposeDemoListActivity.class));
+                break;
+            case R.id.cast_demo:
+                //M2c 投屏 Demo 入口（发现列表 mock + 手动输入 IP 回退）
+                startActivity(new Intent(this, CastDemoActivity.class));
                 break;
         }
     }

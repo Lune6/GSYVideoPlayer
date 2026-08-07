@@ -2,6 +2,35 @@
 
 **[Click to see the English version](UPDATE_VERSION_EN.md)**
 
+### Unreleased
+
+### v13.1.0 (2026-06-30)
+
+- 发布 `gsyvideoplayer-compose` artifact，支持 Maven Central / GitHub Packages 双渠道坐标。
+- 新增 `gsyVideoPlayer-compose` 模块，提供 Wrapper（AndroidView 包装）和 Native（Compose 自绘控制层）两种接入模式。
+- App Demo 新增 24 个 Compose Activity，覆盖基础播放、列表、自动连播、多窗口、切流、缓存下载、字幕、广告、弹幕、滤镜、WebView 混合、纯音频、本地文件、MediaCodec 切换等场景。
+- 新增智能 MediaCodec 硬解失败自动降级软解 Demo，并补充调研文档说明硬解相关错误的判定边界。
+- 优化自动播放列表 Demo 的生命周期处理，减少滑动复用场景中的播放状态错乱。
+- 优化 Exo cache 生命周期与最大缓存配置，补充导出和配置相关回归测试。
+- 补充 Java / Compose 回归测试 playbook，统一双渠道发布文档和依赖示例到 v13.1.0。
+
+### v13.0.0 (2026-05-07)
+
+- 新增 Exo HLS master / DASH MPD 自适应清晰度 Demo，支持查看 video track 列表、恢复 TrackSelector 自动选择、固定某个清晰度 track。
+- 新增近期播放能力说明文档，汇总 WebVTT 进度条预览、通用字幕、完成保留最后一帧、截图、GL 效果、多 URL 清晰度切换和 Exo 自适应清晰度 Demo。
+- 通用外挂字幕支持 SRT/WebVTT，可跨 IJK、System、Media3 内核使用；字幕异常不影响主播放。
+- 进度条预览改为 WebVTT 缩略图轨道方案，支持独立图片和 sprite 坐标裁剪。
+- 截图能力补齐 SurfaceView、TextureView、GLSurfaceView 回调，并新增包含播放器 UI 的组合截图 API。
+- GL 渲染 Demo 增加多种效果场景，强化 GL renderer 生命周期、截图和释放安全性。
+- 多 URL 清晰度切换优化位置同步、超时、失败回退和临时 manager 释放，降低切换回 0 的风险。
+- 新增完成后保留最后一帧 Demo 和专题文档，方便验证自然播放完成后的封面和 Surface 保留策略。
+- 播放器内核创建和初始化失败时走错误回调与资源清理，降低直接 crash 风险。
+- 优化 Exo cache 生命周期处理和 GIF 生成结束/失败后的清理流程。
+- 修复字幕 detach/全屏/小窗切换时 loader 释放和恢复逻辑，避免线程泄漏、字幕状态丢失和加载中断后不恢复。
+- Exo cache 目录被锁时播放回退到非缓存路径，并避免 hadCached 状态误报。
+- 修复 SurfaceView 截图失败时 bitmap 未释放的问题。
+- 修复预览 VTT 旧异步任务覆盖已清空或已替换 provider 的问题。
+
 ### v12.1.0 (2026-04-01)
 
 - update media3 1.10.0
@@ -1587,5 +1616,3 @@ holder.gsyVideoPlayer.setPlayPosition(position);
 ### 1.1.1
 * 增加了ListVideoUtil全屏是否显示横屏，全屏是否自动旋转。
 * 增加了ListVideoUtils隐藏状态栏和title的接口。
-
-
